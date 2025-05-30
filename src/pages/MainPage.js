@@ -186,7 +186,7 @@ const MainPage = () => {
         const result = await response.json();
 
         if (response.ok) {
-          const apiCategories = result.data.categories.map(cat => cat.categoryName);
+          const apiCategories = result.data.map(cat => cat.categoryName);
           setCategories(['전체', ...apiCategories]);
         } else {
           console.error('카테고리 조회 실패:', result.message);
