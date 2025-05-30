@@ -280,7 +280,7 @@ const BookDetailPage = () => {
               </div>
               <div className="info-row">
                 <label>출간일:</label>
-                <span>{book.publishDate}</span>
+                <span>{book.publicationTime}</span>
               </div>
               <div className="info-row">
                 <label>페이지:</label>

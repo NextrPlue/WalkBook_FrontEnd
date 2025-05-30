@@ -26,7 +26,7 @@ const MainPage = () => {
           title: book.title,
           author: book.author,
           publisher: book.publisher,
-          publishDate: book.publicationDate,
+          publishDate: book.publicationTime,
           description: book.description,
           coverUrl: book.coverUrl,
           categoryId: book.categoryId,
