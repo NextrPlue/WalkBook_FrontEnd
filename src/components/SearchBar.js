@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './SearchBar.css';
 
-const SearchBar = ({ onSearch, placeholder = "도서명 또는 저자명으로 검색..." }) => {
+const SearchBar = ({ onSearch, placeholder = "🔍 도서명 또는 저자명으로 검색..." }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
   const handleInputChange = (e) => {
@@ -18,7 +18,6 @@ const SearchBar = ({ onSearch, placeholder = "도서명 또는 저자명으로 �
   return (
     <div className="search-bar">
       <div className="search-input-container">
-        <span className="search-icon">🔍</span>
         <input
           type="text"
           value={searchTerm}

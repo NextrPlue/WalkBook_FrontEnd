@@ -1,5 +1,7 @@
 .search-bar {
-  margin-bottom: 1.5rem;
+  margin-bottom: 2.5rem;
+  display: flex;
+  justify-content: center;
 }
 
 .search-input-container {
@@ -10,7 +12,7 @@
 
 .search-input {
   width: 100%;
-  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  padding: 0.75rem 1rem;
   border: 2px solid #e9ecef;
   border-radius: 25px;
   font-size: 0.9rem;
@@ -26,16 +28,6 @@
 
 .search-input::placeholder {
   color: #999;
-}
-
-.search-icon {
-  position: absolute;
-  left: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #666;
-  font-size: 0.9rem;
-  pointer-events: none;
 }
 
 .clear-button {
@@ -72,12 +64,7 @@
   }
   
   .search-input {
-    padding: 0.6rem 1rem 0.6rem 2.2rem;
-    font-size: 0.8rem;
-  }
-  
-  .search-icon {
-    left: 0.6rem;
+    padding: 0.6rem 1rem;
     font-size: 0.8rem;
   }
   
