@@ -124,7 +124,7 @@ const MainPage = () => {
     }
   ];
 
-  const categories = ['전체', '소설', '에세이', '자기계발', '기술', '경제', '역사'];
+  const [categories, setCategories] = useState(['전체']);
 
   useEffect(() => {
     // 더미 데이터로 초기화 (실제로는 API 호출)
@@ -150,6 +150,27 @@ const MainPage = () => {
 
     setFilteredBooks(filtered);
   }, [selectedCategory, searchTerm, books]);
+
+  // 카테고리 API 호출
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch('http://localhost:4000/categories'); //API 수정
+        const result = await response.json();
+
+        if (response.ok && result.status === 200) {
+          const apiCategories = result.data.categories.map(cat => cat.categoryName);
+          setCategories(['전체', ...apiCategories]);
+        } else {
+          console.error('카테고리 조회 실패:', result.message);
+        }
+      } catch (error) {
+        console.error('카테고리 API 호출 오류:', error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const handleBookClick = (bookId) => {
     navigate(`/book/${bookId}`);
