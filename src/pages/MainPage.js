@@ -185,7 +185,7 @@ const MainPage = () => {
         const response = await fetch('http://localhost:8080/api/categories'); //API 수정
         const result = await response.json();
 
-        if (response.ok && result.status === 200) {
+        if (response.ok) {
           const apiCategories = result.data.categories.map(cat => cat.categoryName);
           setCategories(['전체', ...apiCategories]);
         } else {
