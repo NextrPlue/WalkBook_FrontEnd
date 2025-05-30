@@ -155,7 +155,7 @@ const MainPage = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch('http://localhost:4000/categories'); //API 수정
+        const response = await fetch('http://localhost:8080/api/categories'); //API 수정
         const result = await response.json();
 
         if (response.ok && result.status === 200) {
