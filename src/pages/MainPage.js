@@ -4,6 +4,8 @@ import Header from '../components/Header';
 import BookCard from '../components/BookCard';
 import SearchBar from '../components/SearchBar';
 import './MainPage.css';
+import { fetchBooks } from '../api/bookService';
+
 
 const MainPage = () => {
   const navigate = useNavigate();
@@ -127,9 +129,34 @@ const MainPage = () => {
   const [categories, setCategories] = useState(['전체']);
 
   useEffect(() => {
-    // 더미 데이터로 초기화 (실제로는 API 호출)
-    setBooks(dummyBooks);
+  // API에서 도서 데이터를 가져옴
+    const fetchData = async () => {
+      try {
+        const booksFromAPI = await fetchBooks();
+        const formattedBooks = booksFromAPI.map(book => ({
+          bookId: book.bookId,
+          isbn: book.isbn,
+          title: book.title,
+          author: book.author,
+          publisher: book.publisher,
+          publishDate: book.publicationDate,
+          description: book.description,
+          coverUrl: book.coverUrl,
+          categoryId: book.categoryId,
+          // category: categoryIdToName[book.categoryId],
+          createdAt: book.createdAt,
+          updatedAt: book.updatedAt
+          
+        }));
+        setBooks(formattedBooks);
+      } catch (err) {
+        console.error('도서 데이터 로딩 실패:', err);
+      }
+    };
+
+    fetchData();
   }, []);
+
 
   useEffect(() => {
     // 카테고리와 검색어에 따른 필터링
