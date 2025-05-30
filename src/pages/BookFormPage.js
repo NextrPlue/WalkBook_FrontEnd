@@ -1,20 +1,25 @@
 import React, { useState } from 'react';
 import './BookFormPage.css';
 import Header from '../components/Header';
+import axios from 'axios';
+import { useLocation } from 'react-router-dom';
 
 export default function BookFormPage() {
+  const location = useLocation();
+  const passedBook = location.state?.book;
+  const isEditMode = Boolean(passedBook); // 전달된 데이터
+
   const [formData, setFormData] = useState({
-    title: '',
-    author: '',
-    publisher: '',
-    publishDate: '',
-    isbn: '',
-    category: '',
-    description: '',
+    title: passedBook?.title || '',
+    author: passedBook?.author || '',
+    publisher: passedBook?.publisher || '',
+    publishDate: passedBook?.publishDate || '',
+    isbn: passedBook?.isbn || '',
+    category: passedBook?.category || '',
+    description: passedBook?.description || '',
     additionalPrompts: '',
     apikey: '',
   });
-
   // 하드코딩된 AI 설정
   const AI_MODEL = "DALL-E 3";
   const handleInputChange = (e) => {
@@ -92,9 +97,30 @@ export default function BookFormPage() {
     }
   };
 
-  const handleSave = () => {
-    // 저장 로직
-    console.log('저장하기', formData);
+  const handleSave = async () => {
+    try {
+      const url = isEditMode
+      ? `/api/books/${passedBook.id}`   // 수정
+      : '/api/books';   
+
+      const method = isEditMode ? 'put' : 'post';
+
+      const response = await axios({
+        method,
+        url,
+        data: formData,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      alert(isEditMode ? '도서 정보가 수정되었습니다.' : '도서가 추가되었습니다.');
+      return response.data;
+    } catch (error) {
+      console.error('저장 실패:', error);
+      alert('저장 중 오류가 발생했습니다.');
+      throw error;
+    }
   };
 
   return (
@@ -258,7 +284,7 @@ export default function BookFormPage() {
                         📤 이미지 생성
                     </button>
                   <button onClick={handleSave} className="save-button">
-                    저장 하기
+                    {isEditMode ? '수정하기' : '저장하기'}
                   </button>
                 </div>
               </div>
