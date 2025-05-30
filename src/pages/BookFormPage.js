@@ -13,7 +13,7 @@ export default function BookFormPage() {
     title: passedBook?.title || '',
     author: passedBook?.author || '',
     publisher: passedBook?.publisher || '',
-    publishDate: passedBook?.publishDate || '',
+    publishDate: passedBook?.publicationTime || '',
     isbn: passedBook?.isbn || '',
     category: passedBook?.category || '',
     description: passedBook?.description || '',
