@@ -8,6 +8,17 @@ const BookDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [book, setBook] = useState(null);
+  const [imageError, setImageError] = useState(false);
+
+  // 이미지 오류 처리 핸들러
+  const handleImageError = () => {
+    setImageError(true);
+  };
+
+  // 이미지 로드 성공 핸들러
+  const handleImageLoad = () => {
+    setImageError(false);
+  };
 
   useEffect(() => {
     // 실제로는 API에서 책 정보를 가져올 코드
@@ -236,8 +247,14 @@ const BookDetailPage = () => {
       <main className="detail-content">
         <div className="book-detail">
           <div className="book-cover-section">
-            {book.coverImage ? (
-              <img src={book.coverImage} alt={book.title} className="detail-cover" />
+            {book.coverUrl && !imageError ? (
+              <img 
+                src={book.coverUrl} 
+                alt={book.title} 
+                className="detail-cover"
+                onError={handleImageError}
+                onLoad={handleImageLoad}
+              />
             ) : (
               <div className="detail-default-cover">
                 <span>표지 이미지</span>
