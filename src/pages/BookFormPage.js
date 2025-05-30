@@ -15,7 +15,7 @@ export default function BookFormPage() {
 
   // 하드코딩된 AI 설정
   const AI_MODEL = "DALL-E 3";
-  const API_KEY = process.env.DALLE_API_KEY
+  const API_KEY = process.env.REACT_APP_DALLE_API_KEY;
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -24,11 +24,75 @@ export default function BookFormPage() {
     }));
   };
 
-  const handleImageUpload = () => {
-    // AI 이미지 생성 로직
-    console.log('AI 이미지 생성 시작');
-    console.log('모델:', AI_MODEL);
-    console.log('프롬프트:', formData.additionalPrompts);
+  const [generatedImage, setGeneratedImage] = useState(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const handleImageUpload = async () => {
+    if (!formData.title && !formData.additionalPrompts) {
+      alert('책 제목이나 추가 프롬프트를 입력해주세요.');
+      return;
+    }
+  
+    setIsGenerating(true);
+    
+    try {
+      console.log("API KEY=", API_KEY)
+      // 프롬프트 생성
+      let prompt = '';
+      if (formData.title) {
+        prompt += `Create a professional book cover design for "${formData.title}"`;
+        if (formData.author) {
+          prompt += ` by ${formData.author}`;
+        }
+        if (formData.category) {
+          prompt += ` in the ${formData.category} genre`;
+        }
+      }
+      
+      if (formData.additionalPrompts) {
+        prompt += `. ${formData.additionalPrompts}`;
+      }
+      
+      prompt += '. The design should be clean, professional, and suitable for a book cover with clear typography and attractive visual elements.';
+  
+      console.log('생성할 프롬프트:', prompt);
+  
+      const response = await fetch('https://api.openai.com/v1/images/generations', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'dall-e-3',
+          prompt: prompt,
+          n: 1,
+          size: '1024x1024',
+          quality: 'standard',
+          response_format: 'url'
+        }),
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || '이미지 생성에 실패했습니다.');
+      }
+  
+      const data = await response.json();
+      
+      if (data.data && data.data.length > 0) {
+        setGeneratedImage(data.data[0].url);
+        console.log('이미지 생성 완료:', data.data[0].url);
+      } else {
+        throw new Error('생성된 이미지가 없습니다.');
+      }
+      
+    } catch (error) {
+      console.error('이미지 생성 오류:', error);
+      alert(`이미지 생성 중 오류가 발생했습니다: ${error.message}`);
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const handleSave = () => {
@@ -64,11 +128,11 @@ export default function BookFormPage() {
       </header>
 
       {/* Main Content */}
-      <main className="main-content">
+      <main className="main-content-form">
         <div className="content-card">
           {/* Form Header */}
           <div className="form-header">
-            <h2 className="form-title">제목 입력</h2>
+            <h2 className="form-title">추가 하기</h2>
           </div>
 
           <div className="form-body">
@@ -82,10 +146,16 @@ export default function BookFormPage() {
                 
                 <div className="image-container">
                   <img
-                    src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 500'%3E%3Crect width='400' height='500' fill='%23000'/%3E%3Cg fill='%23fff' opacity='0.3'%3E%3Ccircle cx='50' cy='50' r='3'/%3E%3Ccircle cx='80' cy='70' r='2'/%3E%3Ccircle cx='120' cy='40' r='2.5'/%3E%3Ccircle cx='150' cy='80' r='2'/%3E%3Ccircle cx='200' cy='60' r='3'/%3E%3Ccircle cx='250' cy='90' r='2'/%3E%3Ccircle cx='300' cy='70' r='2.5'/%3E%3Ccircle cx='350' cy='50' r='2'/%3E%3Ccircle cx='70' cy='120' r='2'/%3E%3Ccircle cx='110' cy='140' r='3'/%3E%3Ccircle cx='160' cy='130' r='2'/%3E%3Ccircle cx='210' cy='150' r='2.5'/%3E%3Ccircle cx='270' cy='140' r='2'/%3E%3Ccircle cx='320' cy='120' r='3'/%3E%3Ccircle cx='40' cy='180' r='2.5'/%3E%3Ccircle cx='90' cy='200' r='2'/%3E%3Ccircle cx='140' cy='190' r='3'/%3E%3Ccircle cx='190' cy='210' r='2'/%3E%3Ccircle cx='240' cy='200' r='2.5'/%3E%3Ccircle cx='290' cy='180' r='2'/%3E%3Ccircle cx='340' cy='190' r='3'/%3E%3C/g%3E%3Crect x='120' y='150' width='160' height='200' fill='%23ff6b35' rx='10'/%3E%3Ctext x='200' y='200' text-anchor='middle' fill='%23000' font-size='24' font-weight='bold'%3E소%3C/text%3E%3Ctext x='200' y='230' text-anchor='middle' fill='%23000' font-size='24' font-weight='bold'%3E녀%3C/text%3E%3Ctext x='200' y='260' text-anchor='middle' fill='%23000' font-size='24' font-weight='bold'%3E이%3C/text%3E%3Ctext x='200' y='290' text-anchor='middle' fill='%23000' font-size='24' font-weight='bold'%3E 온%3C/text%3E%3Ctext x='200' y='320' text-anchor='middle' fill='%23000' font-size='24' font-weight='bold'%3E다%3C/text%3E%3Ctext x='140' y='180' text-anchor='middle' fill='%23000' font-size='10'%3E한강%3C/text%3E%3Ctext x='140' y='340' text-anchor='middle' fill='%23000' font-size='10'%3E창비%3C/text%3E%3C/svg%3E"
-                    alt="AI 생성된 책 표지"
+                    src={generatedImage || "기본_SVG_이미지"}
+                    alt={generatedImage ? "AI 생성된 책 표지" : "기본 책 표지 플레이스홀더"}
                     className="book-cover"
                   />
+                  {isGenerating && (
+                    <div className="loading-overlay">
+                      <div className="loading-spinner"></div>
+                      <p>이미지 생성 중...</p>
+                    </div>
+                  )}
                 </div>
               </div>
 
