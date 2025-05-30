@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
+import axiosInstance from '../api/axiosInstance';
 import './BookDetailPage.css';
 
 const BookDetailPage = () => {
@@ -11,7 +12,7 @@ const BookDetailPage = () => {
   useEffect(() => {
     // 실제로는 API에서 책 정보를 가져올 코드
     // 더미 데이터로 시뮬레이션
-    const dummyBooks = {
+    const dummyBook = {
       1: {
         id: 1,
         title: '1984',
@@ -158,39 +159,56 @@ const BookDetailPage = () => {
       }
     };
 
-    const bookData = dummyBooks[parseInt(id)];
-    if (bookData) {
-      setBook(bookData);
-    } else {
-      // 존재하지 않는 도서인 경우 기본값 설정
-      setBook({
-        id: parseInt(id),
-        title: `도서 이름 ${id}`,
-        author: '저자',
-        category: '소설',
-        coverImage: null,
-        description: '이 책은 매우 흥미로운 내용을 담고 있습니다. 저자의 깊이 있는 통찰력과 뛰어난 문체가 돋보이는 작품입니다.',
-        publishDate: '2024-01-01',
-        publisher: '출판사명',
-        pages: 300,
-        isbn: '978-89-1234-567-8'
-      });
-    }
+    const fetchBook = async () => {
+      try {
+        const response = await axiosInstance.get(`/books/${id}`);
+        const bookData = response.data.data;
+        setBook(bookData);
+      } catch (error) {
+        console.error('도서 상세 조회 실패:', error);
+        setBook(dummyBook[0]);
+      }
+    };
+
+    fetchBook();
   }, [id]);
 
-  const handleEdit = () => {
-    // TODO: 팀원이 도서 수정 페이지 완성 후 주석 해제
-    // navigate(`/book/edit/${id}`);
-    
-    // 임시 처리: 페이지가 준비되지 않았다는 알림
-    alert('도서 수정 페이지는 현재 개발 중입니다.\n팀원이 완성 후 이용 가능합니다.');
+
+  const handleEdit = async () => {
+    try {
+      const updatedBook = {
+        isbn: book.isbn,
+        title: book.title, 
+        author: book.author,
+        publisher: book.publisher,
+        publicationDate: book.publicationDate,
+        description: book.description,
+        coverUrl: book.coverUrl,
+        category_id: book.categoryId
+      };
+
+      await axiosInstance.put(`/books/${id}`, updatedBook);
+
+      alert('도서 정보가 수정되었습니다!');
+      // 수정 후 다시 상세조회 해도 되고 navigate 사용 가능
+      // 예: navigate(`/books/${id}`);
+    } catch (error) {
+      console.error('도서 수정 실패:', error);
+      alert('도서 수정에 실패했습니다.');
+    }
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (window.confirm('정말로 이 도서를 삭제하시겠습니까?')) {
-      // 실제로는 삭제 API 호출
-      alert('도서가 삭제되었습니다.');
-      navigate('/');
+      try {
+        await axiosInstance.delete(`/books/${id}`);
+
+        alert('도서가 삭제되었습니다.');
+        navigate('/'); 
+      } catch (error) {
+        console.error('도서 삭제 실패:', error);
+        alert('도서 삭제에 실패했습니다.');
+      }
     }
   };
 
