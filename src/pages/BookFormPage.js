@@ -132,7 +132,7 @@ export default function BookFormPage() {
         <div className="content-card">
           {/* Form Header */}
           <div className="form-header">
-            <h2 className="form-title">제목 입력</h2>
+            <h2 className="form-title">추가 하기</h2>
           </div>
 
           <div className="form-body">

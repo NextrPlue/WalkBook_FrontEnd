@@ -15,11 +15,10 @@ const Header = ({
   const navigate = useNavigate();
 
   const handleAddBook = () => {
-    // TODO: 팀원이 도서 등록 페이지 완성 후 주석 해제
-    // navigate('/book/new');
+    navigate('/book/new');
     
     // 임시 처리: 페이지가 준비되지 않았다는 알림
-    alert('도서 등록 페이지는 현재 개발 중입니다.\n팀원이 완성 후 이용 가능합니다.');
+    //alert('도서 등록 페이지는 현재 개발 중입니다.\n팀원이 완성 후 이용 가능합니다.');
   };
 
   const handleHomeClick = () => {
