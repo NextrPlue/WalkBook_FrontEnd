@@ -1,21 +1,27 @@
 import React, { useState } from 'react';
 import './BookFormPage.css';
+import Header from '../components/Header';
+import axios from 'axios';
+import { useLocation } from 'react-router-dom';
 
 export default function BookFormPage() {
-  const [formData, setFormData] = useState({
-    title: '',
-    author: '',
-    publisher: '',
-    publishDate: '',
-    isbn: '',
-    category: '',
-    description: '',
-    additionalPrompts: ''
-  });
+  const location = useLocation();
+  const passedBook = location.state?.book;
+  const isEditMode = Boolean(passedBook); // 전달된 데이터
 
+  const [formData, setFormData] = useState({
+    title: passedBook?.title || '',
+    author: passedBook?.author || '',
+    publisher: passedBook?.publisher || '',
+    publishDate: passedBook?.publishDate || '',
+    isbn: passedBook?.isbn || '',
+    category: passedBook?.category || '',
+    description: passedBook?.description || '',
+    additionalPrompts: '',
+    apikey: '',
+  });
   // 하드코딩된 AI 설정
   const AI_MODEL = "DALL-E 3";
-  const API_KEY = process.env.REACT_APP_DALLE_API_KEY;
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -28,24 +34,20 @@ export default function BookFormPage() {
   const [isGenerating, setIsGenerating] = useState(false);
 
   const handleImageUpload = async () => {
-    if (!formData.title && !formData.additionalPrompts) {
-      alert('책 제목이나 추가 프롬프트를 입력해주세요.');
+    if (!formData.title && !formData.apikey) {
+      alert('책 제목이나 API-KEY를 입력해주세요.');
       return;
     }
   
     setIsGenerating(true);
     
     try {
-      console.log("API KEY=", API_KEY)
       // 프롬프트 생성
       let prompt = '';
       if (formData.title) {
         prompt += `Create a professional book cover design for "${formData.title}"`;
         if (formData.author) {
           prompt += ` by ${formData.author}`;
-        }
-        if (formData.category) {
-          prompt += ` in the ${formData.category} genre`;
         }
       }
       
@@ -60,7 +62,7 @@ export default function BookFormPage() {
       const response = await fetch('https://api.openai.com/v1/images/generations', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${API_KEY}`,
+          'Authorization': `Bearer ${formData.apikey}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -95,37 +97,40 @@ export default function BookFormPage() {
     }
   };
 
-  const handleSave = () => {
-    // 저장 로직
-    console.log('저장하기', formData);
+  const handleSave = async () => {
+    try {
+      const url = isEditMode
+      ? `/api/books/${passedBook.id}`   // 수정
+      : '/api/books';   
+
+      const method = isEditMode ? 'put' : 'post';
+
+      const response = await axios({
+        method,
+        url,
+        data: formData,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      alert(isEditMode ? '도서 정보가 수정되었습니다.' : '도서가 추가되었습니다.');
+      return response.data;
+    } catch (error) {
+      console.error('저장 실패:', error);
+      alert('저장 중 오류가 발생했습니다.');
+      throw error;
+    }
   };
 
   return (
     <div className="app-container">
       {/* Header */}
-      <header className="header">
-        <div className="header-content">
-          <div className="header-left">
-            <div className="profile-icon"></div>
-            <h1 className="app-title">도서 관리 시스템</h1>
-          </div>
-          <div className="header-right">
-            <input
-              type="text"
-              placeholder="검색어 입력"
-              className="search-input"
-            />
-            <input
-              type="text"
-              placeholder="카테고리 선택"
-              className="category-input"
-            />
-            <button className="add-button">
-              <span className="plus-icon">+</span>
-            </button>
-          </div>
-        </div>
-      </header>
+      <Header 
+        showCategoryDropdown={false} 
+        showAddButton={true} 
+        showBackButton={true}
+      />
 
       {/* Main Content */}
       <main className="main-content-form">
@@ -245,6 +250,18 @@ export default function BookFormPage() {
                   />
                 </div>
 
+                {/* API KEY */}
+                <div className="input-group">
+                  <label className="input-label">API KEY</label>
+                  <input
+                    type="text"
+                    name="apikey"
+                    value={formData.apikey}
+                    onChange={handleInputChange}
+                    className="form-input"
+                  />
+                </div>
+
                 {/* Additional Prompts */}
                 <div className="input-group">
                   <label className="input-label">
@@ -267,7 +284,7 @@ export default function BookFormPage() {
                         📤 이미지 생성
                     </button>
                   <button onClick={handleSave} className="save-button">
-                    저장 하기
+                    {isEditMode ? '수정하기' : '저장하기'}
                   </button>
                 </div>
               </div>

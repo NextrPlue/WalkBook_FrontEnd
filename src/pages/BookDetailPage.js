@@ -166,7 +166,7 @@ const BookDetailPage = () => {
         setBook(bookData);
       } catch (error) {
         console.error('도서 상세 조회 실패:', error);
-        setBook(dummyBook[0]);
+        setBook(dummyBook[1]);
       }
     };
 
@@ -176,22 +176,22 @@ const BookDetailPage = () => {
 
   const handleEdit = async () => {
     try {
-      const updatedBook = {
-        isbn: book.isbn,
-        title: book.title, 
-        author: book.author,
-        publisher: book.publisher,
-        publicationDate: book.publicationDate,
-        description: book.description,
-        coverUrl: book.coverUrl,
-        category_id: book.categoryId
-      };
+      // const updatedBook = {
+      //   isbn: book.isbn,
+      //   title: book.title, 
+      //   author: book.author,
+      //   publisher: book.publisher,
+      //   publicationDate: book.publicationDate,
+      //   description: book.description,
+      //   coverUrl: book.coverUrl,
+      //   category_id: book.categoryId
+      // };
 
-      await axiosInstance.put(`/books/${id}`, updatedBook);
+      // await axiosInstance.put(`/books/${id}`, updatedBook);
 
-      alert('도서 정보가 수정되었습니다!');
+      //alert('도서 정보가 수정되었습니다!');
       // 수정 후 다시 상세조회 해도 되고 navigate 사용 가능
-      // 예: navigate(`/books/${id}`);
+      navigate(`/book/edit/${id}`, {state : {book}});
     } catch (error) {
       console.error('도서 수정 실패:', error);
       alert('도서 수정에 실패했습니다.');
