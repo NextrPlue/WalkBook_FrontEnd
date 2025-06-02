@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import './BookFormPage.css';
 import Header from '../components/Header';
 import CategoryDropdown from '../components/CategoryDropdown';
-import axios from 'axios';
-import { useLocation } from 'react-router-dom';
+import axiosInstance from '../api/axiosInstance';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { fetchCategories, fetchCategoryById } from '../api/bookService';
 
 export default function BookFormPage() {
   const location = useLocation();
+  const navigate = useNavigate();
   const passedBook = location.state?.book;
   const isEditMode = Boolean(passedBook); // 전달된 데이터
 
@@ -146,6 +147,23 @@ export default function BookFormPage() {
 
   const handleSave = async () => {
     try {
+      // 필수 필드 검증
+      if (!formData.title.trim()) {
+        alert('제목을 입력해주세요.');
+        return;
+      }
+      if (!formData.author.trim()) {
+        alert('저자를 입력해주세요.');
+        return;
+      }
+      if (!formData.isbn.trim()) {
+        alert('ISBN을 입력해주세요.');
+        return;
+      }
+      if (!formData.publisher.trim()) {
+        alert('출판사를 입력해주세요.');
+        return;
+      }
       // 카테고리 선택 확인
       if (!formData.categoryId) {
         alert('카테고리를 선택해주세요.');
@@ -157,32 +175,36 @@ export default function BookFormPage() {
         title: formData.title,
         author: formData.author,
         publisher: formData.publisher,
-        publicationDate: formData.publishDate,
-        description: formData.description,
+        publicationTime: formData.publishDate || '',
+        description: formData.description || '',
         coverUrl: generatedImage || null,
         categoryId: parseInt(formData.categoryId)
       };
       
+      console.log('전송할 데이터:', requestData);
+      
       const url = isEditMode
-      ? `/api/books/${passedBook.id}`   // 수정
-      : '/api/books';   
+      ? `/books/${passedBook.id}`   // 수정
+      : '/books';   
 
       const method = isEditMode ? 'put' : 'post';
+      
+      console.log(`API 요청: ${method.toUpperCase()} ${url}`);
 
-      const response = await axios({
+      const response = await axiosInstance({
         method,
         url,
         data: requestData,
-        headers: {
-          'Content-Type': 'application/json',
-        },
       });
 
       alert(isEditMode ? '도서 정보가 수정되었습니다.' : '도서가 추가되었습니다.');
+      
+      // 성공 후 메인 페이지로 이동
+      navigate('/');
+      
       return response.data;
     } catch (error) {
       console.error('저장 실패:', error);
-      alert('저장 중 오류가 발생했습니다.');
       throw error;
     }
   };
