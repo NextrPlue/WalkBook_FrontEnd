@@ -47,8 +47,10 @@ const Header = ({
           {showCategoryDropdown && (
             <CategoryDropdown
               categories={categories}
-              selectedCategory={selectedCategory}
+              selectedCategoryId={categories.find(cat => cat.categoryName === selectedCategory)?.id || categories.find(cat => cat.categoryName === selectedCategory)?.categoryId}
               onCategoryChange={onCategoryChange}
+              placeholder="카테고리 선택"
+              useFormStyle={false}
             />
           )}
           {showAddButton && (
