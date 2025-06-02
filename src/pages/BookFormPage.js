@@ -205,6 +205,7 @@ export default function BookFormPage() {
       return response.data;
     } catch (error) {
       console.error('저장 실패:', error);
+      alert('저장 중 오류가 발생했습니다.');
       throw error;
     }
   };
