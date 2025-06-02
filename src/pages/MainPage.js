@@ -13,7 +13,8 @@ const MainPage = () => {
   const [selectedCategory, setSelectedCategory] = useState('전체');
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredBooks, setFilteredBooks] = useState([]);
-  const [categories, setCategories] = useState(['전체']);
+  const [categories, setCategories] = useState([]);
+  const [categoryIdToNameMap, setCategoryIdToNameMap] = useState({});
 
   useEffect(() => {
   // API에서 도서 데이터를 가져옴
@@ -30,10 +31,8 @@ const MainPage = () => {
           description: book.description,
           coverUrl: book.coverUrl,
           categoryId: book.categoryId,
-          // category: categoryIdToName[book.categoryId],
           createdAt: book.createdAt,
           updatedAt: book.updatedAt
-          
         }));
         setBooks(formattedBooks);
       } catch (err) {
@@ -51,7 +50,10 @@ const MainPage = () => {
 
     // 카테고리 필터링
     if (selectedCategory !== '전체') {
-      filtered = filtered.filter(book => book.category === selectedCategory);
+      filtered = filtered.filter(book => {
+        const categoryName = categoryIdToNameMap[book.categoryId];
+        return categoryName === selectedCategory;
+      });
     }
 
     // 검색어 필터링
@@ -63,15 +65,25 @@ const MainPage = () => {
     }
 
     setFilteredBooks(filtered);
-  }, [selectedCategory, searchTerm, books]);
+  }, [selectedCategory, searchTerm, books, categoryIdToNameMap]);
 
   // 카테고리 API 호출
   useEffect(() => {
     const loadCategories = async () => {
       try {
         const categoriesData = await fetchCategories();
-        const apiCategories = categoriesData.map(cat => cat.categoryName);
-        setCategories(['전체', ...apiCategories]);
+        
+        // 카테고리 ID와 이름의 매핑 만들기
+        const idToNameMap = {};
+        categoriesData.forEach(cat => {
+          const categoryId = cat.categoryId || cat.id;
+          idToNameMap[categoryId] = cat.categoryName;
+        });
+        setCategoryIdToNameMap(idToNameMap);
+        
+        // 전체 카테고리를 포함한 카테고리 목록 설정
+        const allCategories = [{ id: 'all', categoryName: '전체' }, ...categoriesData];
+        setCategories(allCategories);
       } catch (error) {
         console.error('카테고리 API 호출 오류:', error);
       }
@@ -80,12 +92,20 @@ const MainPage = () => {
     loadCategories();
   }, []);
 
-  const handleBookClick = (bookId) => {
-    navigate(`/book/${bookId}`);
+  const handleCategoryChange = (category) => {
+    if (category) {
+      setSelectedCategory(category.categoryName);
+    } else {
+      setSelectedCategory('전체');
+    }
   };
 
   const handleSearch = (term) => {
     setSearchTerm(term);
+  };
+
+  const handleBookClick = (bookId) => {
+    navigate(`/book/${bookId}`);
   };
 
   const getResultMessage = () => {
@@ -105,7 +125,7 @@ const MainPage = () => {
         showCategoryDropdown={true}
         categories={categories}
         selectedCategory={selectedCategory}
-        onCategoryChange={setSelectedCategory}
+        onCategoryChange={handleCategoryChange}
         showAddButton={true}
       />
 

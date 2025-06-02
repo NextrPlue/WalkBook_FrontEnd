@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './BookFormPage.css';
 import Header from '../components/Header';
-import axios from 'axios';
-import { useLocation } from 'react-router-dom';
+import CategoryDropdown from '../components/CategoryDropdown';
+import axiosInstance from '../api/axiosInstance';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { fetchCategories, fetchCategoryById } from '../api/bookService';
 
 export default function BookFormPage() {
   const location = useLocation();
+  const navigate = useNavigate();
   const passedBook = location.state?.book;
   const isEditMode = Boolean(passedBook); // 전달된 데이터
 
@@ -15,13 +18,58 @@ export default function BookFormPage() {
     publisher: passedBook?.publisher || '',
     publishDate: passedBook?.publicationTime || '',
     isbn: passedBook?.isbn || '',
-    category: passedBook?.category || '',
+    categoryId: passedBook?.categoryId || '',
     description: passedBook?.description || '',
     additionalPrompts: '',
     apikey: '',
   });
+  
+  const [categories, setCategories] = useState([]);
+  const [selectedCategoryName, setSelectedCategoryName] = useState('');
   // 하드코딩된 AI 설정
   const AI_MODEL = "DALL-E 3";
+  
+  // 카테고리 목록 불러오기
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const categoriesData = await fetchCategories();
+        setCategories(categoriesData);
+        
+        // 수정 모드이고 categoryId가 있는 경우 카테고리 이름 조회
+        if (isEditMode && passedBook?.categoryId) {
+          try {
+            const categoryData = await fetchCategoryById(passedBook.categoryId);
+            setSelectedCategoryName(categoryData.categoryName);
+          } catch (error) {
+            console.error('카테고리 조회 실패:', error);
+            setSelectedCategoryName('알 수 없음');
+          }
+        }
+      } catch (error) {
+        console.error('카테고리 목록 조회 실패:', error);
+      }
+    };
+    
+    loadCategories();
+  }, [isEditMode, passedBook?.categoryId]);
+  
+  const handleCategoryChange = (category) => {
+    if (category) {
+      const categoryId = category.categoryId || category.id;
+      setFormData(prev => ({
+        ...prev,
+        categoryId: categoryId
+      }));
+      setSelectedCategoryName(category.categoryName);
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        categoryId: ''
+      }));
+      setSelectedCategoryName('');
+    }
+  };
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -102,22 +150,61 @@ export default function BookFormPage() {
 
   const handleSave = async () => {
     try {
+      // 필수 필드 검증
+      if (!formData.title.trim()) {
+        alert('제목을 입력해주세요.');
+        return;
+      }
+      if (!formData.author.trim()) {
+        alert('저자를 입력해주세요.');
+        return;
+      }
+      if (!formData.isbn.trim()) {
+        alert('ISBN을 입력해주세요.');
+        return;
+      }
+      if (!formData.publisher.trim()) {
+        alert('출판사를 입력해주세요.');
+        return;
+      }
+      // 카테고리 선택 확인
+      if (!formData.categoryId) {
+        alert('카테고리를 선택해주세요.');
+        return;
+      }
+      
+      const requestData = {
+        isbn: formData.isbn,
+        title: formData.title,
+        author: formData.author,
+        publisher: formData.publisher,
+        publicationTime: formData.publishDate || '',
+        description: formData.description || '',
+        coverUrl: generatedImage || null,
+        categoryId: parseInt(formData.categoryId)
+      };
+      
+      console.log('전송할 데이터:', requestData);
+      
       const url = isEditMode
-      ? `/api/books/${passedBook.id}`   // 수정
-      : '/api/books';   
+      ? `/books/${passedBook.id}`   // 수정
+      : '/books';   
 
       const method = isEditMode ? 'put' : 'post';
+      
+      console.log(`API 요청: ${method.toUpperCase()} ${url}`);
 
-      const response = await axios({
+      const response = await axiosInstance({
         method,
         url,
-        data: formData,
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        data: requestData,
       });
 
       alert(isEditMode ? '도서 정보가 수정되었습니다.' : '도서가 추가되었습니다.');
+      
+      // 성공 후 메인 페이지로 이동
+      navigate('/');
+      
       return response.data;
     } catch (error) {
       console.error('저장 실패:', error);
@@ -140,7 +227,7 @@ export default function BookFormPage() {
         <div className="content-card">
           {/* Form Header */}
           <div className="form-header">
-            <h2 className="form-title">추가 하기</h2>
+            <h2 className="form-title">{isEditMode ? '도서 수정' : '도서 추가'}</h2>
           </div>
 
           <div className="form-body">
@@ -229,16 +316,19 @@ export default function BookFormPage() {
                   </div>
                 </div>
 
-                {/* Category */}
+                {/* Category Dropdown */}
                 <div className="input-group">
                   <label className="input-label">카테고리</label>
-                  <input
-                    type="text"
-                    name="category"
-                    value={formData.category}
-                    onChange={handleInputChange}
-                    className="form-input"
+                  <CategoryDropdown
+                    categories={categories}
+                    selectedCategoryId={formData.categoryId}
+                    onCategoryChange={handleCategoryChange}
+                    placeholder="카테고리를 선택하세요"
+                    useFormStyle={true}
                   />
+                  {selectedCategoryName && (
+                    <span className="selected-category-info">선택된 카테고리: {selectedCategoryName}</span>
+                  )}
                 </div>
 
                 {/* Description */}
