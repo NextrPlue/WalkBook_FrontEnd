@@ -270,8 +270,9 @@ export default function BookFormPage() {
               <div className="form-section">
                 {/* Title Input - 맨 위에 위치 */}
                 <div className="input-group">
-                  <label className="input-label">제목</label>
+                  <label htmlFor="title-input" className="input-label">제목</label>
                   <input
+                    id="title-input"
                     type="text"
                     name="title"
                     value={formData.title}
@@ -283,8 +284,9 @@ export default function BookFormPage() {
                 {/* Author and Publisher Row */}
                 <div className="form-row">
                   <div className="input-group">
-                    <label className="input-label">저자</label>
+                    <label htmlFor="author" className="input-label">저자</label>
                     <input
+                      id="author"
                       type="text"
                       name="author"
                       value={formData.author}
@@ -293,8 +295,9 @@ export default function BookFormPage() {
                     />
                   </div>
                   <div className="input-group">
-                    <label className="input-label">출판사</label>
+                    <label htmlFor="publisher" className="input-label">출판사</label>
                     <input
+                      id="publisher"
                       type="text"
                       name="publisher"
                       value={formData.publisher}
@@ -307,8 +310,9 @@ export default function BookFormPage() {
                 {/* Publish Date and ISBN Row */}
                 <div className="form-row">
                   <div className="input-group">
-                    <label className="input-label">출간일</label>
+                    <label htmlFor="publishDate" className="input-label">출간일</label>
                     <input
+                      id="publishDate"
                       type="text"
                       name="publishDate"
                       value={formData.publishDate}
@@ -317,8 +321,9 @@ export default function BookFormPage() {
                     />
                   </div>
                   <div className="input-group">
-                    <label className="input-label">ISBN</label>
+                    <label htmlFor="isbn" className="input-label">ISBN</label>
                     <input
+                      id="isbn"
                       type="text"
                       name="isbn"
                       value={formData.isbn}
@@ -345,8 +350,9 @@ export default function BookFormPage() {
 
                 {/* Description */}
                 <div className="input-group">
-                  <label className="input-label">책 소개</label>
+                  <label htmlFor="book-description" className="input-label">책 소개</label>
                   <textarea
+                    id="book-description"
                     name="description"
                     value={formData.description}
                     onChange={handleInputChange}
@@ -357,8 +363,9 @@ export default function BookFormPage() {
 
                 {/* API KEY */}
                 <div className="input-group">
-                  <label className="input-label">API KEY</label>
+                  <label htmlFor="apikey" className="input-label">API KEY</label>
                   <input
+                    id="apikey"
                     type="text"
                     name="apikey"
                     value={formData.apikey}
@@ -369,11 +376,12 @@ export default function BookFormPage() {
 
                 {/* Additional Prompts */}
                 <div className="input-group">
-                  <label className="input-label">
+                  <label htmlFor="addPrompt" className="input-label">
                     추가 프롬프트 입력 (선택)
                     <span className="label-helper">AI 이미지 생성용</span>
                   </label>
                   <textarea
+                    id="addPrompt"
                     name="additionalPrompts"
                     value={formData.additionalPrompts}
                     onChange={handleInputChange}
