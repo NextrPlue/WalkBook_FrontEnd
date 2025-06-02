@@ -49,13 +49,16 @@ export default function BookFormPage() {
         if (formData.author) {
           prompt += ` by ${formData.author}`;
         }
+        if (formData.description) {
+          prompt += ` .This book is about ${formData.description}`
+        }
       }
       
       if (formData.additionalPrompts) {
         prompt += `. ${formData.additionalPrompts}`;
       }
       
-      prompt += '. The design should be clean, professional, and suitable for a book cover with clear typography and attractive visual elements.';
+      prompt += '. The design should be clean, professional, poetic, immersive and suitable for a book cover with clear typography and attractive visual elements.';
   
       console.log('생성할 프롬프트:', prompt);
   
