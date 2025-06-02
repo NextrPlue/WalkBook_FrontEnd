@@ -163,6 +163,13 @@ WalkBook은 **AI 기반 도서 커버 이미지 생성 기능을 포함한 도�
 
 > **AI 생성 이미지를 다양한 디바이스에서 최적으로 표시**할 수 있도록 반응형 이미지 갤러리를 구현했습니다.
 
+### 📌 테스트 코드 작성 
+
+> 안정적인 기능 제공을 위한 기반을 마련하기 위해 **테스트 코드** 작성하였습니다.
+> 
+> 반복적인 수동 테스트를 줄이고, 기능 변경 시 기존 기능의 이상 유무를 빠르게 검증할 수 있습니다.
+
+
 <br>
 
 ## 링크 모음
@@ -208,16 +215,7 @@ cd WalkBook_FrontEnd
 npm install
 ```
 
-### 3. 환경 변수 설정
-```bash
-# .env 파일 생성 후 설정
-REACT_APP_API_BASE_URL=http://localhost:8080
-REACT_APP_AI_API_URL=http://localhost:8081  # AI 서비스 URL
-REACT_APP_USE_DUMMY_DATA=true  # 개발 시 true, 연동 시 false
-REACT_APP_AI_ENABLED=false     # AI 기능 활성화 여부
-```
-
-### 4. 개발 서버 실행
+### 3. 개발 서버 실행
 ```bash
 npm start
 ```
