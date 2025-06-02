@@ -78,7 +78,7 @@ export default function BookFormPage() {
     }));
   };
 
-  const [generatedImage, setGeneratedImage] = useState(null);
+  const [generatedImage, setGeneratedImage] = useState(passedBook?.coverUrl || null);
   const [isGenerating, setIsGenerating] = useState(false);
 
   const handleImageUpload = async () => {
@@ -106,7 +106,7 @@ export default function BookFormPage() {
         prompt += `. ${formData.additionalPrompts}`;
       }
       
-      prompt += '. The design should be clean, professional, poetic, immersive and suitable for a book cover with clear typography and attractive visual elements.';
+      prompt += '. The design should be clean, professional, and suitable for a book cover with clear typography and attractive visual elements.';
   
       console.log('생성할 프롬프트:', prompt);
   
@@ -180,7 +180,7 @@ export default function BookFormPage() {
         publisher: formData.publisher,
         publicationTime: formData.publishDate || '',
         description: formData.description || '',
-        coverUrl: generatedImage || null,
+        coverUrl: generatedImage || (isEditMode ? passedBook?.coverUrl : null),
         categoryId: parseInt(formData.categoryId)
       };
       
@@ -235,16 +235,28 @@ export default function BookFormPage() {
               {/* Left: AI Generated Image */}
               <div className="image-section">
                 <div className="image-header">
-                  <h3 className="image-title">AI 생성 이미지</h3>
+                  <h3 className="image-title">{isEditMode && passedBook?.coverUrl && generatedImage === passedBook?.coverUrl ? '도서 커버' : 'AI 생성 이미지'}</h3>
                   <span className="model-badge">모델: {AI_MODEL}</span>
                 </div>
                 
                 <div className="image-container">
-                  <img
-                    src={generatedImage || "기본_SVG_이미지"}
-                    alt={generatedImage ? "AI 생성된 책 표지" : "기본 책 표지 플레이스홀더"}
-                    className="book-cover"
-                  />
+                  {generatedImage ? (
+                    <img
+                      src={generatedImage}
+                      alt={isEditMode && passedBook?.coverUrl ? "도서 커버 이미지" : "AI 생성된 책 표지"}
+                      className="book-cover"
+                      onError={(e) => {
+                        console.error('이미지 로드 실패:', e.target.src);
+                        e.target.style.display = 'none';
+                      }}
+                    />
+                  ) : (
+                    <div className="placeholder-content">
+                      <div className="placeholder-icon">📚</div>
+                      <p className="placeholder-text">이미지가 없습니다</p>
+                      <p className="placeholder-subtext">AI 이미지 생성 버튼을 눌러주세요</p>
+                    </div>
+                  )}
                   {isGenerating && (
                     <div className="loading-overlay">
                       <div className="loading-spinner"></div>
