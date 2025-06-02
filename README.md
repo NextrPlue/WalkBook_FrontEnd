@@ -1,4 +1,5 @@
 # WalkBook 도서 관리 시스템
+![image](https://github.com/user-attachments/assets/58d6a391-d19a-4e99-9236-88fcae8bc4e7)
 
 > 목차
 > - [📌 프로젝트 소개](#프로젝트-소개)
