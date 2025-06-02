@@ -4,7 +4,7 @@ import Header from '../components/Header';
 import BookCard from '../components/BookCard';
 import SearchBar from '../components/SearchBar';
 import './MainPage.css';
-import { fetchBooks } from '../api/bookService';
+import { fetchBooks, fetchCategories } from '../api/bookService';
 
 
 const MainPage = () => {
@@ -67,23 +67,17 @@ const MainPage = () => {
 
   // 카테고리 API 호출
   useEffect(() => {
-    const fetchCategories = async () => {
+    const loadCategories = async () => {
       try {
-        const response = await fetch('http://localhost:8080/api/categories'); //API 수정
-        const result = await response.json();
-
-        if (response.ok) {
-          const apiCategories = result.data.map(cat => cat.categoryName);
-          setCategories(['전체', ...apiCategories]);
-        } else {
-          console.error('카테고리 조회 실패:', result.message);
-        }
+        const categoriesData = await fetchCategories();
+        const apiCategories = categoriesData.map(cat => cat.categoryName);
+        setCategories(['전체', ...apiCategories]);
       } catch (error) {
         console.error('카테고리 API 호출 오류:', error);
       }
     };
 
-    fetchCategories();
+    loadCategories();
   }, []);
 
   const handleBookClick = (bookId) => {

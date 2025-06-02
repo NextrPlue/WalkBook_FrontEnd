@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import axiosInstance from '../api/axiosInstance';
+import { fetchCategoryById } from '../api/bookService';
 import './BookDetailPage.css';
 
 const BookDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [book, setBook] = useState(null);
+  const [categoryName, setCategoryName] = useState('');
   const [imageError, setImageError] = useState(false);
 
   // 이미지 오류 처리 핸들러
@@ -175,9 +177,21 @@ const BookDetailPage = () => {
         const response = await axiosInstance.get(`/books/${id}`);
         const bookData = response.data.data;
         setBook(bookData);
+        
+        // 카테고리 이름 조회
+        if (bookData.categoryId) {
+          try {
+            const categoryData = await fetchCategoryById(bookData.categoryId);
+            setCategoryName(categoryData.categoryName);
+          } catch (categoryError) {
+            console.error('카테고리 조회 실패:', categoryError);
+            setCategoryName('알 수 없음');
+          }
+        }
       } catch (error) {
         console.error('도서 상세 조회 실패:', error);
         setBook(dummyBook[1]);
+        setCategoryName('소설'); // 더미 데이터의 카테고리
       }
     };
 
@@ -272,7 +286,7 @@ const BookDetailPage = () => {
               </div>
               <div className="info-row">
                 <label>카테고리:</label>
-                <span>{book.category}</span>
+                <span>{categoryName || book.category || '로딩 중...'}</span>
               </div>
               <div className="info-row">
                 <label>출판사:</label>
