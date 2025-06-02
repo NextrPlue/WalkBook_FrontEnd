@@ -296,10 +296,10 @@ const BookDetailPage = () => {
                 <label>출간일:</label>
                 <span>{book.publicationTime}</span>
               </div>
-              <div className="info-row">
+              {/* <div className="info-row">
                 <label>페이지:</label>
                 <span>{book.pages}페이지</span>
-              </div>
+              </div> */}
               <div className="info-row">
                 <label>ISBN:</label>
                 <span>{book.isbn}</span>
