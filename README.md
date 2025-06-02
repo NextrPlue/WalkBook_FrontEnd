@@ -243,3 +243,9 @@ npm start
 - **Node.js**: 개발 환경
 - **npm**: 패키지 매니저
 - **Git**: 버전 관리
+
+<br>
+
+## 시연 영상
+
+https://github.com/user-attachments/assets/92e5927b-fc12-4838-a824-fb697b0e6ddf
